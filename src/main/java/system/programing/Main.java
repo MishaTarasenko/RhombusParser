@@ -6,11 +6,13 @@ import system.programing.input.parser.InputParser;
 import system.programing.lexical.analyzer.Analyzer;
 import system.programing.lexical.analyzer.Token;
 import system.programing.lexical.analyzer.TokenType;
+import system.programing.rhombus.draw.RhombusPanel;
 import system.programing.semantic.analyzer.Rhombus;
 import system.programing.semantic.analyzer.SemanticAnalyzer;
 import system.programing.syntax.analyzer.ParseTreeNode;
 import system.programing.syntax.analyzer.SyntaxAnalyzer;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -19,16 +21,16 @@ import java.util.Set;
 
 public class Main {
     private static final List<String> inputs = List.of(
-            "Знайдіть всі кути ромба, якщо його периметр дорівнює 24 см, а висота - 3 см.",
-            "Знайдіть периметр ромба ABCD, якщо ∠A = 60°, сторона BD = 9 см.",
-            "Одна з діагоналей ромба дорівнює 30 см. Знайти іншу діагональ ромба, якщо його периметр дорівнює 68 см.",
-            "Сторона ромба дорівнює 6 см, а його площа – 18 см2. Знайти найбільший кут ромба.",
-            "Периметр ромба ABCD дорівнює 52 см, AN дорівнює 12 см, а DN – 5 см, знайдіть AD.",
-            "Периметр ромба ABCD дорівнює 52 см, AN дорівнює 12 см, а DN – 5 см, знайдіть AC.",
-            "У ромбі ABCD всі сторони = 8 см. Знайдіть його периметр.",
-            "Діагональ ромба дорівнює 10 см, а інша - 24 см. Обчисліть площу цього ромба.",
-            "У ромба один з гострих кутів дорівнює 60°. Знайдіть всі інші кути ромба.",
-            "Якщо одна діагональ дорівнює 16 см, а інша - 12 см, знайдіть довжину сторони ромба."
+//            "Знайдіть всі кути ромба ABCD, якщо його периметр дорівнює 24 см, а висота - 3 см.",
+//            "Знайдіть периметр ромба ABCD, якщо ∠A = 60°, сторона BD = 9 см.",
+//            "Одна з діагоналей ромба дорівнює 30 см. Знайти іншу діагональ ромба, якщо його периметр дорівнює 68 см.",
+//            "Сторона ромба дорівнює 6 см, а його площа – 18 см2. Знайти найбільший кут ромба.",
+//            "Периметр ромба ABCD дорівнює 52 см, AN дорівнює 12 см, а DN – 5 см, знайдіть AD.",
+//            "Периметр ромба ABCD дорівнює 52 см, AN дорівнює 12 см, а DN – 5 см, знайдіть AC.",
+//            "У ромбі ABCD всі сторони = 8 см. Знайдіть його периметр.",
+//            "Діагональ ромба дорівнює 10 см, а інша - 24 см. Обчисліть площу цього ромба.",
+//            "У ромба один з гострих кутів дорівнює 60°. Знайдіть всі інші кути ромба.",
+//            "Якщо одна діагональ дорівнює 16 см, а інша - 12 см, знайдіть довжину сторони ромба.",
             );
 
     public static void main(String[] args) throws IOException, InterruptedException, SyntaxAnalyzer.SyntaxException, SemanticAnalyzer.SemanticException {
@@ -41,7 +43,7 @@ public class Main {
             DataAnalyzer dataAnalyzer = new DataAnalyzer(analyzer.analyze());
             String commands = dataAnalyzer.getCommands();
 
-            for (String command: commands.split("#")) {
+            for (String command : commands.split("#")) {
                 Analyzer lexer = new Analyzer(command);
                 List<String> tokens = new ArrayList<>();
                 Token token;
@@ -59,6 +61,13 @@ public class Main {
             SemanticAnalyzer semanticAnalyzer = new SemanticAnalyzer();
             Rhombus rhombus = semanticAnalyzer.analyze(parseTrees);
             System.out.println(rhombus);
+
+            JFrame frame = new JFrame("Малювання Ромба");
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.add(new RhombusPanel(rhombus));
+            frame.pack();
+            frame.setLocationRelativeTo(null);
+            frame.setVisible(true);
 
             System.out.println("\n\n");
         }
