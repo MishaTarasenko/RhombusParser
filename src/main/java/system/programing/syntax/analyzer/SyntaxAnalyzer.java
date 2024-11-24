@@ -9,7 +9,6 @@ public class SyntaxAnalyzer {
 
     public SyntaxAnalyzer(List<String> tokens) {
         this.tokens = tokens;
-        System.out.println(tokens);
     }
 
     public ParseTreeNode parseSentence() throws SyntaxException {
@@ -135,7 +134,7 @@ public class SyntaxAnalyzer {
     private ParseTreeNode parseDataType() throws SyntaxException {
         ParseTreeNode node = new ParseTreeNode(TreeNodeType.DATA_TYPE);
         String currentToken = tokens.get(index);
-                // Обробка складних типів даних
+
                 switch (currentToken) {
                     case "ПЕРИМЕТР":
                     case "ПЛОЩА":
@@ -163,18 +162,18 @@ public class SyntaxAnalyzer {
                         switch (measureType) {
                             case "КУТА":
                                 match("КУТА");
-                                node.addChild(new ParseTreeNode(TreeNodeType.KEYWORD, "МІРУ КУТА"));
+                                node.addChild(new ParseTreeNode(TreeNodeType.KEYWORD, "КУТ"));
                                 node.addChild(parseIdentifier());
                                 break;
                             case "ГОСТРИЙ":
                                 index++;
                                 match("КУТ");
-                                node.addChild(new ParseTreeNode(TreeNodeType.KEYWORD, "МІРУ ГОСТРИЙ КУТ"));
+                                node.addChild(new ParseTreeNode(TreeNodeType.KEYWORD, "ГОСТРИЙ КУТ"));
                                 break;
                             case "ТУПИЙ":
                                 index++;
                                 match("КУТ");
-                                node.addChild(new ParseTreeNode(TreeNodeType.KEYWORD, "МІРУ ТУПИЙ КУТ"));
+                                node.addChild(new ParseTreeNode(TreeNodeType.KEYWORD, "ТУПИЙ КУТ"));
                                 break;
                             default:
                                 throw new SyntaxException("Невідомий тип міри: " + measureType);

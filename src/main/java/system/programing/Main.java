@@ -6,6 +6,8 @@ import system.programing.input.parser.InputParser;
 import system.programing.lexical.analyzer.Analyzer;
 import system.programing.lexical.analyzer.Token;
 import system.programing.lexical.analyzer.TokenType;
+import system.programing.semantic.analyzer.Rhombus;
+import system.programing.semantic.analyzer.SemanticAnalyzer;
 import system.programing.syntax.analyzer.ParseTreeNode;
 import system.programing.syntax.analyzer.SyntaxAnalyzer;
 
@@ -29,15 +31,15 @@ public class Main {
             "Якщо одна діагональ дорівнює 16 см, а інша - 12 см, знайдіть довжину сторони ромба."
             );
 
-    public static void main(String[] args) throws IOException, InterruptedException, SyntaxAnalyzer.SyntaxException {
+    public static void main(String[] args) throws IOException, InterruptedException, SyntaxAnalyzer.SyntaxException, SemanticAnalyzer.SemanticException {
         for (String text : inputs) {
+            List<ParseTreeNode> parseTrees = new ArrayList<>();
             Set<String> identifiersMap = new HashSet<>();
             InputParser parser = new InputParser(text);
             FirstAnalyzer analyzer = new FirstAnalyzer(parser.parse());
             System.out.println(text);
             DataAnalyzer dataAnalyzer = new DataAnalyzer(analyzer.analyze());
             String commands = dataAnalyzer.getCommands();
-            System.out.println("Commands --> " + commands);
 
             for (String command: commands.split("#")) {
                 Analyzer lexer = new Analyzer(command);
@@ -52,10 +54,11 @@ public class Main {
                 }
 
                 SyntaxAnalyzer syntaxAnalyzer = new SyntaxAnalyzer(tokens);
-                ParseTreeNode parseTree = syntaxAnalyzer.parseSentence();
-                System.out.println("Parse Tree:");
-                parseTree.printTree("", true);
+                parseTrees.add(syntaxAnalyzer.parseSentence());
             }
+            SemanticAnalyzer semanticAnalyzer = new SemanticAnalyzer();
+            Rhombus rhombus = semanticAnalyzer.analyze(parseTrees);
+            System.out.println(rhombus);
 
             System.out.println("\n\n");
         }
