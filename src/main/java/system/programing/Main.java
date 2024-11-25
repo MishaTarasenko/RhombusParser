@@ -7,6 +7,7 @@ import system.programing.lexical.analyzer.Analyzer;
 import system.programing.lexical.analyzer.Token;
 import system.programing.lexical.analyzer.TokenType;
 import system.programing.rhombus.draw.RhombusPanel;
+import system.programing.rhombus.solution.RhombusSolver;
 import system.programing.semantic.analyzer.Rhombus;
 import system.programing.semantic.analyzer.SemanticAnalyzer;
 import system.programing.syntax.analyzer.ParseTreeNode;
@@ -26,15 +27,16 @@ public class Main {
 //            "Одна з діагоналей ромба дорівнює 30 см. Знайти іншу діагональ ромба, якщо його периметр дорівнює 68 см.",
 //            "Сторона ромба дорівнює 6 см, а його площа – 18 см2. Знайти найбільший кут ромба.",
 //            "Периметр ромба ABCD дорівнює 52 см, AN дорівнює 12 см, а DN – 5 см, знайдіть AD.",
-//            "Периметр ромба ABCD дорівнює 52 см, AN дорівнює 12 см, а DN – 5 см, знайдіть AC.",
+            "В ромбі ABCD AN дорівнює 12 см, а DN – 5 см, знайдіть AD."
 //            "У ромбі ABCD всі сторони = 8 см. Знайдіть його периметр.",
 //            "Діагональ ромба дорівнює 10 см, а інша - 24 см. Обчисліть площу цього ромба.",
-//            "У ромба один з гострих кутів дорівнює 60°. Знайдіть всі інші кути ромба."
+//            "У ромба один з гострих кутів дорівнює 60°. Знайдіть всі інші кути ромба.",
 //            "Якщо одна діагональ дорівнює 16 см, а інша - 12 см, знайдіть довжину сторони ромба."
             );
 
     public static void main(String[] args) throws IOException, InterruptedException, SyntaxAnalyzer.SyntaxException, SemanticAnalyzer.SemanticException {
         for (String text : inputs) {
+            RhombusSolver solver = new RhombusSolver();
             List<ParseTreeNode> parseTrees = new ArrayList<>();
             Set<String> identifiersMap = new HashSet<>();
             InputParser parser = new InputParser(text);
@@ -70,8 +72,11 @@ public class Main {
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);
 
+            solver.solve(rhombus);
+            System.out.println(rhombus);
+
             System.out.println("\n\n");
-            Thread.sleep(3000);
+            Thread.sleep(5000);
         }
     }
 }

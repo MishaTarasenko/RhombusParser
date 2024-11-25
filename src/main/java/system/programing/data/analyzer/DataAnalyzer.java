@@ -115,9 +115,9 @@ public class DataAnalyzer {
     }
 
     private String buildOtherCommand(DataInfo info, DataInfo prevInfo) {
-            if (prevInfo.getType() == DataType.DIAGONAL) {
-                return buildDiagonalCommand(info);
-            }
+        if (prevInfo != null && prevInfo.getType() == DataType.DIAGONAL) {
+            return buildDiagonalCommand(info);
+        }
         return "Визначити " + info.getName() + " = " + info.getValue() + "#";
     }
 
