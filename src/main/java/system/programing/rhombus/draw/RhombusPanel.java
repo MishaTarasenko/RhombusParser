@@ -141,10 +141,31 @@ public class RhombusPanel extends JPanel {
     }
 
     private void drawHalfDiagonals(Graphics2D g2d, int[] xPoints, int[] yPoints, int centerX, int centerY) {
-        FontMetrics fm = g2d.getFontMetrics();
 
-        // Малюємо Першу половину діагоналі (AO та OC), якщо вона задана
-        if (rhombus.getHalfDiagonal1Name() != null && rhombus.getHalfDiagonal1Value() != null) {
+        Double hd1Value = null;
+        Double hd2Value = null;
+
+        if (rhombus.getHalfDiagonal1Value() != null && rhombus.getHalfDiagonal1Name() != null) {
+            if (rhombus.getHalfDiagonal1Name().contains(String.valueOf(rhombus.getIdentifier().charAt(0))) ||
+                    rhombus.getHalfDiagonal1Name().contains(String.valueOf(rhombus.getIdentifier().charAt(2)))) {
+                hd2Value = rhombus.getHalfDiagonal1Value();
+            } else if (rhombus.getHalfDiagonal1Name().contains(String.valueOf(rhombus.getIdentifier().charAt(1))) ||
+                    rhombus.getHalfDiagonal1Name().contains(String.valueOf(rhombus.getIdentifier().charAt(3)))) {
+                hd1Value = rhombus.getHalfDiagonal1Value();
+            }
+        }
+
+        if (rhombus.getHalfDiagonal2Value() != null && rhombus.getHalfDiagonal2Name() != null) {
+            if (rhombus.getHalfDiagonal2Name().contains(String.valueOf(rhombus.getIdentifier().charAt(0))) ||
+                    rhombus.getHalfDiagonal2Name().contains(String.valueOf(rhombus.getIdentifier().charAt(2)))) {
+                hd2Value = rhombus.getHalfDiagonal2Value();
+            } else if (rhombus.getHalfDiagonal2Name().contains(String.valueOf(rhombus.getIdentifier().charAt(1))) ||
+                    rhombus.getHalfDiagonal2Name().contains(String.valueOf(rhombus.getIdentifier().charAt(3)))) {
+                hd1Value = rhombus.getHalfDiagonal2Value();
+            }
+        }
+
+        if (hd1Value != null) {
             g2d.setColor(Color.ORANGE);
             g2d.setStroke(new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 0,
                     new float[]{4, 4}, 0));
@@ -154,14 +175,13 @@ public class RhombusPanel extends JPanel {
 
             g2d.drawLine(centerX, centerY, xPoints[2], yPoints[2]);
 
-            Double hd1Value = rhombus.getHalfDiagonal1Value();
 
             g2d.setColor(Color.BLACK);
             g2d.drawString(String.format("%.2f", hd1Value), 250, 290);
             g2d.drawString(String.format("%.2f", hd1Value), 500, 290);
         }
 
-        if (rhombus.getHalfDiagonal2Name() != null && rhombus.getHalfDiagonal2Value() != null) {
+        if (hd1Value != null) {
             g2d.setColor(Color.ORANGE);
             g2d.setStroke(new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 0,
                     new float[]{4, 4}, 0));
@@ -171,7 +191,6 @@ public class RhombusPanel extends JPanel {
 
             g2d.drawLine(centerX, centerY, xPoints[3], yPoints[3]);
 
-            Double hd2Value = rhombus.getHalfDiagonal2Value();
             g2d.setColor(Color.BLACK);
             g2d.drawString(String.format("%.2f", hd2Value), 410, 200);
             g2d.drawString(String.format("%.2f", hd2Value), 410, 400);
