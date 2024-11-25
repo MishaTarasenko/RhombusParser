@@ -76,7 +76,6 @@ public class RhombusSolver {
 
                 if (sinTheta >= 0 && sinTheta <= 1) {
                     double angleA = Math.toDegrees(Math.asin(sinTheta));
-                    // The obtuse angle
                     double angleB = 180.0 - angleA;
 
                     rhombus.setAngleA(angleA);
