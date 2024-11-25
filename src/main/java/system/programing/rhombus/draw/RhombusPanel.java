@@ -14,7 +14,7 @@ public class RhombusPanel extends JPanel {
     public RhombusPanel(Rhombus rhombus) {
         this.rhombus = rhombus;
         vertexLabels = getVertexLabels();
-        this.setPreferredSize(new Dimension(800, 600)); // Збільшено розмір панелі
+        this.setPreferredSize(new Dimension(800, 600));
     }
 
     @Override
@@ -24,37 +24,32 @@ public class RhombusPanel extends JPanel {
     }
 
     private void drawStaticRhombus(Graphics2D g2d) {
-        // Антиалайсінг для гладких ліній
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         Font largerFont = new Font("Arial", Font.BOLD, 18);
         g2d.setFont(largerFont);
 
-        // Визначення статичних координат вершин ромба
         int centerX = getWidth() / 2;
         int centerY = getHeight() / 2;
-        int sizeX = 300; // Розмір по горизонталі (витягнутий)
-        int sizeY = 200; // Розмір по вертикалі (подвоєний)
+        int sizeX = 300;
+        int sizeY = 200;
 
-        // Вершини ромба
         int[] xPoints = {
-                centerX,                // Верхня вершина
-                centerX + sizeX,        // Правий кут
-                centerX,                // Нижня вершина
-                centerX - sizeX         // Лівий кут
+                centerX,
+                centerX + sizeX,
+                centerX,
+                centerX - sizeX
         };
         int[] yPoints = {
-                centerY - sizeY,        // Верхня вершина
-                centerY,                // Правий кут
-                centerY + sizeY,        // Нижня вершина
-                centerY                 // Лівий кут
+                centerY - sizeY,
+                centerY,
+                centerY + sizeY,
+                centerY
         };
 
-        // Малювання ромба
         g2d.setColor(Color.BLUE);
         g2d.setStroke(new BasicStroke(3));
         g2d.drawPolygon(xPoints, yPoints, 4);
 
-        // Відображення назв вершин
         g2d.setColor(Color.BLACK);
         FontMetrics fm = g2d.getFontMetrics();
         for (int i = 0; i < 4; i++) {
@@ -62,63 +57,61 @@ public class RhombusPanel extends JPanel {
             int labelWidth = fm.stringWidth(label);
             int labelHeight = fm.getHeight();
 
-            // Визначення зсуву для назв
             int offsetX = 10;
             int offsetY = 10;
 
             switch (i) {
-                case 0: // Верхня вершина
+                case 0:
                     g2d.drawString(label, xPoints[i] - labelWidth / 2, yPoints[i] - offsetY);
                     break;
-                case 1: // Правий кут
+                case 1:
                     g2d.drawString(label, xPoints[i] + offsetX, yPoints[i] + labelHeight / 2);
                     break;
-                case 2: // Нижня вершина
+                case 2:
                     g2d.drawString(label, xPoints[i] - labelWidth / 2, yPoints[i] + labelHeight + offsetY);
                     break;
-                case 3: // Лівий кут
+                case 3:
                     g2d.drawString(label, xPoints[i] - labelWidth - offsetX, yPoints[i] + labelHeight / 2);
                     break;
             }
         }
 
         if (rhombus.getSide() != null) {
-            g2d.drawString(String.valueOf(rhombus.getSide()), 550, 190);
+            g2d.drawString(String.format("%.2f", rhombus.getSide()), 550, 190);
         }
 
-        // Визначення центру ромба (точка перетину діагоналей)
         boolean hasDiagonal1 = rhombus.getDiagonal1() != null;
         boolean hasDiagonal2 = rhombus.getDiagonal2() != null;
 
         if (hasDiagonal1 || hasDiagonal2) {
-            int centerPointX = centerX;
-            int centerPointY = centerY;
 
-            // Відображення центру ромба
+            Double diagonal1 = hasDiagonal1 ? rhombus.getDiagonal1() : 0;
+            Double diagonal2 = hasDiagonal2 ? rhombus.getDiagonal2() : 0;
 
-            // Відображення назви центру
-            String centerLabel = "O";
-            int labelWidth = fm.stringWidth(centerLabel);
-            g2d.setColor(Color.BLACK);
-            g2d.drawString(centerLabel, centerPointX - labelWidth / 2 + 15, centerPointY - 20);
+            Double d1 = Math.max(diagonal1, diagonal2);
+            Double d2 = Math.min(diagonal1, diagonal2);
 
-            // Малювання діагоналей
-            drawDiagonals(g2d, xPoints, yPoints, hasDiagonal1, hasDiagonal2);
+            drawDiagonals(g2d, xPoints, yPoints, d1, d2);
         }
 
         if (rhombus.getHeightValue() != null && rhombus.getHeightValue() > 0) {
             drawHeight(g2d, xPoints, yPoints, rhombus.getHeightValue(), rhombus.getHeightName());
         }
 
+        drawHalfDiagonals(g2d, xPoints, yPoints, centerX, centerY);
+
         displayAreaAndPerimeter(g2d, fm);
-        displayAngles(g2d, fm, xPoints, yPoints);
+
+        displayAngles(g2d, xPoints, yPoints);
+
+        drawCenter(g2d);
     }
 
     private List<String> getVertexLabels() {
         List<String> defaultLabels = List.of("A", "B", "C", "D");
         String identifier = rhombus.getIdentifier();
 
-        if (identifier != null && identifier.length() >= 4) {
+        if (identifier != null && identifier.length() == 4 && !identifier.equals("NULL")) {
             List<String> labels = new ArrayList<>();
             for (int i = 0; i < 4; i++) {
                 labels.add(String.valueOf(identifier.charAt(i)));
@@ -129,20 +122,72 @@ public class RhombusPanel extends JPanel {
         }
     }
 
-    private void drawDiagonals(Graphics2D g2d, int[] xPoints, int[] yPoints, boolean hasDiagonal1, boolean hasDiagonal2) {
-        g2d.setColor(Color.MAGENTA);
+    private void drawDiagonals(Graphics2D g2d, int[] xPoints, int[] yPoints, Double d1, Double d2) {
+        g2d.setColor(Color.ORANGE);
         g2d.setStroke(new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 0,
-                new float[]{5, 5}, 0)); // Пунктирна лінія
+                new float[]{5, 5}, 0));
 
-        // Діагональ 1: Верхня вершина (A) до Нижньої вершини (C)
-        if (hasDiagonal1) {
-            g2d.drawLine(xPoints[0], yPoints[0], xPoints[2], yPoints[2]);
+        g2d.drawLine(xPoints[0], yPoints[0], xPoints[2], yPoints[2]);
+        if (d1 != null && d1 != 0) {
+            g2d.drawString(String.format("%.2f", d1 / 2), 250, 290);
+            g2d.drawString(String.format("%.2f", d1 / 2), 500, 290);
         }
 
-        // Діагональ 2: Правий кут (B) до Лівого кут (D)
-        if (hasDiagonal2) {
-            g2d.drawLine(xPoints[1], yPoints[1], xPoints[3], yPoints[3]);
+        g2d.drawLine(xPoints[1], yPoints[1], xPoints[3], yPoints[3]);
+        if (d2 != null && d2 != 0) {
+            g2d.drawString(String.format("%.2f", d2 / 2), 410, 200);
+            g2d.drawString(String.format("%.2f", d2 / 2), 410, 400);
         }
+    }
+
+    private void drawHalfDiagonals(Graphics2D g2d, int[] xPoints, int[] yPoints, int centerX, int centerY) {
+        FontMetrics fm = g2d.getFontMetrics();
+
+        // Малюємо Першу половину діагоналі (AO та OC), якщо вона задана
+        if (rhombus.getHalfDiagonal1Name() != null && rhombus.getHalfDiagonal1Value() != null) {
+            g2d.setColor(Color.ORANGE);
+            g2d.setStroke(new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 0,
+                    new float[]{4, 4}, 0));
+
+
+            g2d.drawLine(centerX, centerY, xPoints[0], yPoints[0]);
+
+            g2d.drawLine(centerX, centerY, xPoints[2], yPoints[2]);
+
+            Double hd1Value = rhombus.getHalfDiagonal1Value();
+
+            g2d.setColor(Color.BLACK);
+            g2d.drawString(String.format("%.2f", hd1Value), 250, 290);
+            g2d.drawString(String.format("%.2f", hd1Value), 500, 290);
+        }
+
+        if (rhombus.getHalfDiagonal2Name() != null && rhombus.getHalfDiagonal2Value() != null) {
+            g2d.setColor(Color.ORANGE);
+            g2d.setStroke(new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 0,
+                    new float[]{4, 4}, 0));
+
+
+            g2d.drawLine(centerX, centerY, xPoints[1], yPoints[1]);
+
+            g2d.drawLine(centerX, centerY, xPoints[3], yPoints[3]);
+
+            Double hd2Value = rhombus.getHalfDiagonal2Value();
+            g2d.setColor(Color.BLACK);
+            g2d.drawString(String.format("%.2f", hd2Value), 410, 200);
+            g2d.drawString(String.format("%.2f", hd2Value), 410, 400);
+        }
+    }
+
+    private String getIntersectionName() {
+        if (rhombus.getHalfDiagonal1Name() != null) {
+            return getName(rhombus.getHalfDiagonal1Name());
+        }
+
+        if (rhombus.getHalfDiagonal2Name() != null) {
+            return getName(rhombus.getHalfDiagonal2Name());
+        }
+
+        return "O";
     }
 
     private void drawHeight(Graphics2D g2d, int[] xPoints, int[] yPoints, double height, String name) {
@@ -166,12 +211,10 @@ public class RhombusPanel extends JPanel {
     }
 
     private void displayAreaAndPerimeter(Graphics2D g2d, FontMetrics fm) {
-        // Задаємо відступи від правого та верхнього країв панелі
         int paddingRight = 20;
         int paddingTop = 20;
         int lineHeight = fm.getHeight();
 
-        // Вивід периметра, якщо він заданий
         if (rhombus.getPerimeter() != null) {
             String perimeterText = String.format("Perimeter: %.2f", rhombus.getPerimeter());
             int x = getWidth() - fm.stringWidth(perimeterText) - paddingRight;
@@ -180,7 +223,6 @@ public class RhombusPanel extends JPanel {
             g2d.drawString(perimeterText, x, y);
         }
 
-        // Вивід площі, якщо вона задана
         if (rhombus.getArea() != null) {
             String areaText = String.format("Area: %.2f", rhombus.getArea());
             int x = getWidth() - fm.stringWidth(areaText) - paddingRight;
@@ -190,14 +232,12 @@ public class RhombusPanel extends JPanel {
         }
     }
 
-    private void displayAngles(Graphics2D g2d, FontMetrics fm, int[] xPoints, int[] yPoints) {
-        // Перевірка, чи задані кути
+    private void displayAngles(Graphics2D g2d, int[] xPoints, int[] yPoints) {
         if (rhombus.getAngleA() == null || rhombus.getAngleB() == null) {
             return;
         }
 
-        // Встановлення шрифту для мір кутів
-        Font angleFont = new Font("Arial", Font.BOLD, 16); // Більш великий шрифт
+        Font angleFont = new Font("Arial", Font.BOLD, 16);
         g2d.setFont(angleFont);
         FontMetrics angleFm = g2d.getFontMetrics();
         g2d.setColor(Color.MAGENTA);
@@ -205,21 +245,18 @@ public class RhombusPanel extends JPanel {
         double angleA = rhombus.getAngleA();
         double angleB = rhombus.getAngleB();
 
-        // Кут A - верхня вершина (0)
-        String angleALabel = String.format("%.2f°", angleA);
+        String angleALabel = String.format("%.2f°", angleB);
         int angleALabelWidth = angleFm.stringWidth(angleALabel);
         int angleALabelX = xPoints[0] - angleALabelWidth / 2;
         int angleALabelY = yPoints[0] + 30;
         g2d.drawString(angleALabel, angleALabelX, angleALabelY);
 
-        // Малювання арки для кута A
         int arcRadius = 30;
         g2d.setStroke(new BasicStroke(2));
         g2d.drawArc(xPoints[0] - (arcRadius / 2), yPoints[0] - (arcRadius / 2), arcRadius, arcRadius, 225, 90);
 
 
-        // Кут A - нижня вершина (2)
-        String angleALabel2 = String.format("%.2f°", angleA);
+        String angleALabel2 = String.format("%.2f°", angleB);
         int angleALabelWidth2 = angleFm.stringWidth(angleALabel2);
         int angleALabelX2 = xPoints[2] - angleALabelWidth2 / 2;
         int angleALabelY2 = yPoints[2] - 20;
@@ -228,18 +265,15 @@ public class RhombusPanel extends JPanel {
         g2d.drawArc(xPoints[2] - (arcRadius / 2), yPoints[2] - (arcRadius / 2), arcRadius, arcRadius, 44, 90);
 
 
-        // Кут B - правий кут (1)
-        String angleBLabel = String.format("%.2f°", angleB);
+        String angleBLabel = String.format("%.2f°", angleA);
         int angleBLabelX = xPoints[1] - 90;
         int angleBLabelY = yPoints[1] - angleFm.getAscent() / 2;
         g2d.drawString(angleBLabel, angleBLabelX, angleBLabelY);
 
-        // Малювання арки для кута B
         g2d.drawArc(xPoints[1] - 30, yPoints[1] - (arcRadius / 2), arcRadius, arcRadius, 110, 135);
 
 
-        // Кут B - лівий кут (3)
-        String angleBLabel2 = String.format("%.2f°", angleB);
+        String angleBLabel2 = String.format("%.2f°", angleA);
         int angleBLabelX2 = xPoints[3] + 40;
         int angleBLabelY2 = yPoints[3] + angleFm.getAscent() / 2 - 15;
         g2d.drawString(angleBLabel2, angleBLabelX2, angleBLabelY2);
@@ -250,10 +284,21 @@ public class RhombusPanel extends JPanel {
         g2d.setFont(new Font("Arial", Font.PLAIN, 12));
     }
 
+    private void drawCenter(Graphics2D g2d) {
+        if (rhombus.getDiagonal1() != null || rhombus.getDiagonal2() != null || rhombus.getHalfDiagonal1Name() != null || rhombus.getHalfDiagonal2Name() != null) {
+            String intersectionName = getIntersectionName();
+
+            if (intersectionName != null) {
+                g2d.setColor(Color.BLACK);
+                g2d.drawString(intersectionName, 400 + 15, 300 - 20);
+            }
+        }
+    }
+
     private String getName(String name) {
         String char1 = String.valueOf(name.charAt(0));
         String char2 = String.valueOf(name.charAt(1));
 
-        return vertexLabels.contains(char1)? char2 : char1;
+        return vertexLabels.contains(char1) ? char2 : char1;
     }
 }
